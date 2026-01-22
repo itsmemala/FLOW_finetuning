@@ -30,6 +30,9 @@ LORA_DROPOUT=0.0
 SFA_UPDATE_FREQ=0.25
 SFA_BETA=0.5
 
+# ~~ LA-REG Configuration ~~ #
+CALC_IMP_WGTS=true
+
 # ===== Data Configuration ===== #
 DATASET="meta-math/MetaMathQA" # Dataset to use (expects huggingface format or path)
 SPLIT="train" # Split to use (expects huggingface format)
@@ -122,6 +125,7 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
+            --calc_imp_wgts $CALC_IMP_WGTS
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -153,6 +157,7 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
+            --calc_imp_wgts $CALC_IMP_WGTS
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -186,6 +191,7 @@ else
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
+            --calc_imp_wgts $CALC_IMP_WGTS
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -217,6 +223,7 @@ else
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
+            --calc_imp_wgts $CALC_IMP_WGTS
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
