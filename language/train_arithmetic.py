@@ -216,7 +216,7 @@ def finetune():
             # save relative importance
             sys.exit()
         else: # load calculated weights
-            
+            pass
 
     model.config.use_cache = False
     trainer.train()
