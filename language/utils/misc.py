@@ -64,20 +64,35 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
     return results
 
 def compute_mas_wgts(model, train, args):
+    for n,p in model.named_parameters():
+        mas[n]=0*p.data
+    
+    sbatch=8
     model.train()
     for batch in tqdm(train): # TODO: refactor to be distributed inference
         batch = {k: v.to(args.device) for k, v in batch.items()}
+        # Forward and backward
+        model.zero_grad()
         output = model(**batch)
         logits = output["logits"]
-        print(logits.shape)
+        # print(logits.shape)
         tokenwise_l2_norm = logits.pow(2).sum(dim=-1)
-        print(tokenwise_l2_norm.shape)
+        # print(tokenwise_l2_norm.shape)
         seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1)
-        print(seqwise_l2_norm.shape)
+        # print(seqwise_l2_norm.shape)
         batchwise_l2_norm = seqwise_l2_norm.sum()
         batchwise_l2_norm.backward()
+        # Get gradients
+        for n,p in model.named_parameters():
+            if p.grad is not None:
+                mas[n]+=sbatch*torch.abs(p.grad.data)
         break
+    
+    # Mean importance across all samples
+    for n,_ in model.named_parameters():
+        mas[n]=mas[n]/len(train)
     
     model.zero_grad()
 
-    return logits
+    # return logits
+    return
