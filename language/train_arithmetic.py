@@ -213,6 +213,7 @@ def finetune():
         if args.calc_imp_wgts: # calculate importance weights
             # 1. importance of pre-trained model wrt pre-training data
             pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
+            pt_dataset.set_format(type="torch", columns=['input_ids', 'attention_mask', 'label'])
             print('Calculating importance wrt PT data')
             compute_mas_wgts(model,pt_dataset,args)
             # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task
