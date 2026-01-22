@@ -64,6 +64,7 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
     return results
 
 def compute_mas_wgts(model, train, args):
+    mas={}
     for n,p in model.named_parameters():
         mas[n]=0*p.data
     
