@@ -69,9 +69,8 @@ def compute_mas_wgts(model, train, args):
     model.train()
     for i in tqdm(range(0,len(train),sbatch)):
         b=torch.LongTensor(np.arange(i,np.min([i+sbatch,len(train)])))#.cuda()
-        batch=train[b]
-        print(batch)
-        # output = model.forward(batch['input_ids'])
+        inputs=train[b]
+        output = model.forward(inputs)
         break
     
     model.zero_grad()
