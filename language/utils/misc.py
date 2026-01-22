@@ -69,7 +69,8 @@ def compute_mas_wgts(model, train, args):
     for batch in tqdm(train):
         batch = {k: v.to(args.device) for k, v in batch.items()}
         output = model(**batch)
-        print(output.shape)
+        logits = output["logits"]
+        print(logits.shape)
         break
     
     model.zero_grad()
