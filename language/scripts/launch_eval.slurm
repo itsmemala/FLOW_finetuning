@@ -12,30 +12,29 @@
 
 # Source conda environment and move to project directory (change to your own path)
 
-source $WORK/miniconda3/install/bin/activate flow
-cd /work/09753/hprairie/ls6/projects/FLOW_finetuning/language
+#source $WORK/miniconda3/install/bin/activate flow
+#cd /work/09753/hprairie/ls6/projects/FLOW_finetuning/language
 
 # NOTE: This script expects a single NODE to be used for analysis
 # Set Run Parameters
 
 # NOTE: Each GPU will run a seperate evalutation
-export CUDA_VISIBLE_DEVICES='0' # Specify which GPUs to use
+export CUDA_VISIBLE_DEVICES='0,1' # Specify which GPUs to use
 export HF_ALLOW_CODE_EVAL="1" # Allow eval
 
 
 # RUN_DIRS is a list to all folders with runs
-RUN_DIRS=(
+RUN_DIRS=("/home/local/data/ms/cft_llm/meta-math-flow/Gemma-3-1B/gemma-3-1b-pt/20260121_112322_gemma-3-1b-pt__r64__lr1e-05__ft_full_reg_none__train_train"
 )
 # If model being evaluated used LoRA then set to true to merge model and LoRA weights (i.e, false/true)
 # Use false if not using LoRA
-NEED_TO_MERGE=(
+NEED_TO_MERGE=(false
 )
 # If model being evaluated used LoRA then name the HuggingFace model path to merge weights (i.e., ""/"google/gemma-2-2b")
 # NOTE: Use "" if not using LoRA
-BASE_MODELS=(
+BASE_MODELS=(""
 )
 TASKS="gsm8k,mmlu,arc_easy,arc_challenge,hellaswag,piqa,social_iqa,openbookqa,mbpp"
-
 
 BATCH_SIZE=32
 METHOD="normal" # (Type of model merging done) Options: normal
@@ -117,8 +116,7 @@ for i in "${!RUN_DIRS[@]}"; do
     #     --model_args pretrained=$FINAL_MODEL_PATH,tokenizer=$FINAL_TOKENIZER_PATH,gpu_memory_utilization=0.8,max_model_len=4096 \
     CUDA_VISIBLE_DEVICES=$GPU_ID lm_eval --model hf \
         --model_args pretrained=$FINAL_MODEL_PATH,tokenizer=$FINAL_TOKENIZER_PATH,max_length=4096,trust_remote_code=True \
-        --tasks $TASKS \
-        --wandb_args project=$WANDB_PROJECT,id=$RUN_ID \
+        --tasks $TASKS \        
         --output_path $DUMP_PATH \
         --trust_remote_code \
         --confirm_run_unsafe_code \

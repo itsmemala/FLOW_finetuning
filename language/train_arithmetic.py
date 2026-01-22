@@ -16,7 +16,7 @@ from utils.data_utils import (
     DataCollatorForSupervisedDataset,
 )
 from models import create_model_tokenizer_it, create_peft_model_it, IGNORE_INDEX
-from utils.misc import count_parameters
+from utils.misc import count_parameters, compute_mas_wgts
 from utils.trainer_utils import WeightedLossTrainer, SFATrainer
 from utils.parsing_utils import str_to_bool
 
@@ -205,6 +205,18 @@ def finetune():
             trainer = WeightedLossTrainer(
                 model=model, args=training_args, loss_type=args.reweight_type, ignore_index=IGNORE_INDEX, **data_module
             )
+
+    if args.finetune_type=="lareg":
+        if args.calc_fisher_wgts: # calculate importance weights
+            # 1. importance of pre-trained model wrt pre-training data
+            pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
+            compute_mas_wgts(model,pt_dataset,args)
+            # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task
+            # 3. relative importance
+            # save relative importance
+            sys.exit()
+        else: # load calculated weights
+            
 
     model.config.use_cache = False
     trainer.train()

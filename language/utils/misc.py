@@ -1,3 +1,4 @@
+import numpy a snp
 import torch
 import torch.nn as nn
 from typing import Dict, Tuple
@@ -60,3 +61,16 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
         print(f"Classifier parameters percentage (K): 0%")
     
     return results
+
+def compute_mas_wgts(model, train, args):
+    sbatch = 32
+
+    model.train()
+    for i in tqdm(range(0,len(train),sbatch)):
+        b=torch.LongTensor(np.arange(i,np.min([i+sbatch,len(train)])))#.cuda()
+        batch=train[b]
+        print(batch)
+        # output = model.forward(batch['input_ids'])
+        break
+    
+    model.zero_grad()
