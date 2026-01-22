@@ -125,7 +125,7 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
-            --calc_imp_wgts $CALC_IMP_WGTS
+            --calc_imp_wgts $CALC_IMP_WGTS \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -157,7 +157,7 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
-            --calc_imp_wgts $CALC_IMP_WGTS
+            --calc_imp_wgts $CALC_IMP_WGTS \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -191,7 +191,7 @@ else
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
-            --calc_imp_wgts $CALC_IMP_WGTS
+            --calc_imp_wgts $CALC_IMP_WGTS \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -223,7 +223,7 @@ else
             --lora_dropout $LORA_DROPOUT \
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
-            --calc_imp_wgts $CALC_IMP_WGTS
+            --calc_imp_wgts $CALC_IMP_WGTS \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
