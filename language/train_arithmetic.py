@@ -209,7 +209,7 @@ def finetune():
             )
 
     if args.finetune_type=="lareg":
-        if args.calc_fisher_wgts: # calculate importance weights
+        if args.calc_imp_wgts: # calculate importance weights
             # 1. importance of pre-trained model wrt pre-training data
             pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
             compute_mas_wgts(model,pt_dataset,args)
@@ -291,6 +291,9 @@ if __name__ == "__main__":
     #SFA specific arguments
     parser.add_argument("--sfa-update-freq", type=float, default=0.1, help="The update freq to take a convex combination")
     parser.add_argument("--sfa-beta", type=float, default=0.5, help="The beta used to take a convex combination")
+
+    #LAREG specific arguments
+    parser.add_argument("--calc_imp_wgts", type=bool, default=False, help="Whether to calculate importance weights (only when using LA-REG)")
 
     # General training arguments
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size")

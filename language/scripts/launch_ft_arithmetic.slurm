@@ -11,16 +11,16 @@
 #SBATCH -A MLL                            # Allocation name
 
 # Source conda environment and move to project directory
-source $WORK/miniconda3/install/bin/activate flow
-cd /work/09753/hprairie/ls6/projects/FLOW_finetuning/language
+#source $WORK/miniconda3/install/bin/activate flow
+#cd /work/09753/hprairie/ls6/projects/FLOW_finetuning/language
 
 # NOTE: This script expects a single NODE to be used for analysis
 # Job Configuration
-export CUDA_VISIBLE_DEVICES='0' # Specify which GPU to use
+export CUDA_VISIBLE_DEVICES='0,1' # Specify which GPU to use
 
 # ===== Model Configuration ===== #
-BASE_MODEL="google/gemma-2-2b"
-FINETUNE_TYPE="lora" # none, full, lora, linear-probe, sfa (none will freeze the entire model, which is useful for creating a baseline model)
+BASE_MODEL="meta-llama/Llama-3.2-1B"
+FINETUNE_TYPE="lareg" # none, full, lora, linear-probe, sfa (none will freeze the entire model, which is useful for creating a baseline model)
 
 # ~~ LORA Configuration ~~ #
 LORA_RANK=64
@@ -59,13 +59,13 @@ SEED=42 # Seed to use
 # NOTE: Accelerate hasn't been tested in a bit, aviod for now
 
 # ===== Experiment Configuration ===== #
-BASE_DIR="$SCRATCH/floss_results/experiments" # Base directory for experiments
+BASE_DIR="/home/local/data/ms/cft_llm/meta-math-flow/Llama-3.2-1B" # Base directory for experiments
 WANDB_PROJECT="project-name" # Wandb project to use
 WAND_RUN="none" # Wandb run name to use
 
 # ===== Misc Configuration ===== #
 DEBUG=false # true or false (Will turn off distributed training)
-USE_SLURM=true # true or false (Will use SLURM for distributed training)
+USE_SLURM=false # true or false (Will use SLURM for distributed training)
 
 #### ~~~~~~~~ Do not modify below this line ~~~~~~~~ ####
 MODEL_NAME=$(basename "$BASE_MODEL")
