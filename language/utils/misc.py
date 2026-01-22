@@ -74,3 +74,5 @@ def compute_mas_wgts(model, train, args):
         break
     
     model.zero_grad()
+
+    return logits

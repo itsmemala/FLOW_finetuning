@@ -217,7 +217,9 @@ def finetune():
             data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
             train_dataloader = DataLoader(pt_dataset, collate_fn=data_collator)
             print('Calculating importance wrt PT data')
-            compute_mas_wgts(model,train_dataloader,args)
+            logits = compute_mas_wgts(model,train_dataloader,args)
+            predicted_token_ids = torch.argmax(logits, dim=-1)
+            print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
             # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task
             # 3. relative importance
             # save relative importance
