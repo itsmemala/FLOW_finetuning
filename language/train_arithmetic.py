@@ -147,6 +147,8 @@ def finetune():
         model, lora_config = create_peft_model_it(model, args)
     elif args.finetune_type == "sfa":
         model = model.to(args.device)
+    elif args.finetune_type == "lareg":
+        model = model.to(args.device)
     else:
         raise RuntimeError(f"Unknown finetuning type {args.finetune_type}")
 
