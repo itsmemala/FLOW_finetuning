@@ -215,7 +215,7 @@ def finetune():
             # 1. importance of pre-trained model wrt pre-training data
             pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
             data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-            train_dataloader = DataLoader(pt_dataset, batch_size=32, collate_fn=data_collator)
+            train_dataloader = DataLoader(pt_dataset, batch_size=8, collate_fn=data_collator)
             print('Calculating importance wrt PT data')
             logits = compute_mas_wgts(model,train_dataloader,args)
             # predicted_token_ids = torch.argmax(logits, dim=-1)
