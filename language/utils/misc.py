@@ -64,13 +64,11 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
     return results
 
 def compute_mas_wgts(model, train, args):
-    sbatch = 32
 
     model.train()
-    for i in tqdm(range(0,len(train),sbatch)):
-        b=torch.LongTensor(np.arange(i,np.min([i+sbatch,len(train)])))#.cuda()
-        inputs=train[b]
-        output = model.forward(inputs)
+    for batch in tqdm(train):
+        batch = {k: v.to(args.device) for k, v in batch.items()}
+        outputs = model(**inputs)
         break
     
     model.zero_grad()
