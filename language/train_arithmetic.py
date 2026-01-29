@@ -224,9 +224,9 @@ def finetune():
             # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task
             # 3. relative importance
             # save relative importance
-            sys.exit()
-        else: # load calculated weights
-            pass
+            sys.exit() # TODO: Remove
+        # Load and train
+        
 
     model.config.use_cache = False
     trainer.train()

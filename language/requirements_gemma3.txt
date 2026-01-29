@@ -1,0 +1,17 @@
+accelerate
+datasets==3.1.0
+Fraction
+jsonlines
+numpy
+pandas
+peft
+psutil
+PyYAML
+safetensors
+scikit_learn
+scipy
+sympy
+torch
+tqdm
+transformers==4.57.6
+wandb

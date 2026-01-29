@@ -79,7 +79,7 @@ def compute_mas_wgts(model, train, args):
         # print(logits.shape)
         tokenwise_l2_norm = logits.pow(2).sum(dim=-1)
         # print(tokenwise_l2_norm.shape)
-        seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1)
+        seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1) # TODO: Other options? sum?
         # print(seqwise_l2_norm.shape)
         batchwise_l2_norm = seqwise_l2_norm.sum()
         batchwise_l2_norm.backward()
@@ -87,11 +87,13 @@ def compute_mas_wgts(model, train, args):
         for n,p in model.named_parameters():
             if p.grad is not None:
                 mas[n]+=sbatch*torch.abs(p.grad.data)
-        break
+        break # TODO: Remove
     
     # Mean importance across all samples
     for n,_ in model.named_parameters():
         mas[n]=mas[n]/len(train)
+    # Save
+    
     
     model.zero_grad()
 
