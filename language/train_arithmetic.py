@@ -212,21 +212,26 @@ def finetune():
 
     if args.finetune_type == "lareg":
         if args.calc_imp_wgts: # calculate importance weights
-            # 1. importance of pre-trained model wrt pre-training data
-            pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
+            # # 1. importance of pre-trained model wrt pre-training data
+            # pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args) # TODO: loop through pt datasets instead
+            # data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
+            # train_dataloader = DataLoader(pt_dataset, batch_size=8, collate_fn=data_collator)
+            # print('Calculating importance wrt PT data')
+            # # logits = compute_mas_wgts(model,train_dataloader,args)
+            # # predicted_token_ids = torch.argmax(logits, dim=-1)
+            # # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
+            # compute_mas_wgts(model,train_dataloader,args,'pt')
+            # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task data
+            cur_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args)
             data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-            train_dataloader = DataLoader(pt_dataset, batch_size=8, collate_fn=data_collator)
-            print('Calculating importance wrt PT data')
-            # logits = compute_mas_wgts(model,train_dataloader,args)
-            # predicted_token_ids = torch.argmax(logits, dim=-1)
-            # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
-            compute_mas_wgts(model,train_dataloader,args)
-            # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task
+            train_dataloader = DataLoader(cur_dataset, batch_size=8, collate_fn=data_collator)
+            print('Calculating importance wrt current data')
+            compute_mas_wgts(model,train_dataloader,args,'sft')
             # 3. relative importance
             # save relative importance
             sys.exit() # TODO: Remove
         # Load and train
-        
+
 
     model.config.use_cache = False
     trainer.train()

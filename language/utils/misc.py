@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -63,7 +64,7 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
     
     return results
 
-def compute_mas_wgts(model, train, args):
+def compute_mas_wgts(model, train, args, calc_imp_wrt):
     mas={}
     for n,p in model.named_parameters():
         mas[n]=0*p.data
@@ -87,13 +88,14 @@ def compute_mas_wgts(model, train, args):
         for n,p in model.named_parameters():
             if p.grad is not None:
                 mas[n]+=sbatch*torch.abs(p.grad.data)
-        break # TODO: Remove
+        # break # TODO: Remove
     
     # Mean importance across all samples
     for n,_ in model.named_parameters():
         mas[n]=mas[n]/len(train)
     # Save
-    
+    with open(args.base-dir+'/'+calc_imp_wrt+'_mas_wgts.pkl', 'wb') as fp:
+        pickle.dump(mas, fp)
     
     model.zero_grad()
 
