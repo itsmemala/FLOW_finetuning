@@ -93,7 +93,7 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
     for n,_ in model.named_parameters():
         mas[n]=mas[n]/len(train)
     # Save
-    with open(args.base-dir+'/'+calc_imp_wrt+'_mas_wgts.pkl', 'wb') as fp:
+    with open(args.base_dir+'/'+calc_imp_wrt+'_mas_wgts.pkl', 'wb') as fp:
         pickle.dump(mas, fp)
     
     model.zero_grad()
