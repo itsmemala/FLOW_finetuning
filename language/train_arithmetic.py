@@ -223,7 +223,7 @@ def finetune():
             # # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
             # compute_mas_wgts(model,train_dataloader,batch_size,args,'pt')
             # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task data
-            batch_size = 4
+            batch_size = 2
             cur_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args)
             data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
             train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)

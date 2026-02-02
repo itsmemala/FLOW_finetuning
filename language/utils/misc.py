@@ -70,7 +70,7 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
         mas[n]=0*p.data
     
     model.train()
-    for batch in tqdm(train): # TODO: refactor to be distributed inference
+    for bid,batch in tqdm(enumerate(train)): # TODO: refactor to be distributed inference
         batch = {k: v.to(args.device) for k, v in batch.items()}
         # Forward and backward
         model.zero_grad()
@@ -87,7 +87,8 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
         for n,p in model.named_parameters():
             if p.grad is not None:
                 mas[n]+=sbatch*torch.abs(p.grad.data)
-        break # TODO: Remove
+        bid==(5000//sbatch):
+            break # TODO: Remove
     
     # Mean importance across all samples
     for n,_ in model.named_parameters():
