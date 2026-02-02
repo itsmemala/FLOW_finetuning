@@ -69,7 +69,7 @@ def compute_mas_wgts(model, train, args, calc_imp_wrt):
     for n,p in model.named_parameters():
         mas[n]=0*p.data
     
-    sbatch=4
+    sbatch=2
     model.train()
     for batch in tqdm(train): # TODO: refactor to be distributed inference
         batch = {k: v.to(args.device) for k, v in batch.items()}
