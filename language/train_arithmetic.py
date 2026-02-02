@@ -292,6 +292,7 @@ if __name__ == "__main__":
 
     # Model and Finetuning arguments
     parser.add_argument("--model", type=str, default="mistralai/Mistral-7B-v0.1", help="Model name")
+    parser.add_argument("--tokenizer", type=str, default="mistralai/Mistral-7B-v0.1", help="Model name")
     parser.add_argument(
         "--finetune-type", type=str, choices=["none", "full", "lora", "linear-probe", "sfa", "lareg"], help="Select finetune type"
     )
