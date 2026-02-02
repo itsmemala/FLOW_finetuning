@@ -64,12 +64,11 @@ def count_parameters(model: nn.Module, verbose: bool = False) -> Dict[str, float
     
     return results
 
-def compute_mas_wgts(model, train, args, calc_imp_wrt):
+def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
     mas={}
     for n,p in model.named_parameters():
         mas[n]=0*p.data
     
-    sbatch=1
     model.train()
     for batch in tqdm(train): # TODO: refactor to be distributed inference
         batch = {k: v.to(args.device) for k, v in batch.items()}
