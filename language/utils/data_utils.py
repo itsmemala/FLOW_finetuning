@@ -236,7 +236,7 @@ def custom_preprocess(
     examples = [s + t for s, t in zip(sources, targets)]
     examples_tokenized, sources_tokenized = [_tokenize_fn(strings, tokenizer) for strings in (examples, sources)]
     input_ids = examples_tokenized["input_ids"]
-    return dict(input_ids=input_ids, labels=None) # TODO: labels??
+    return dict(input_ids=input_ids) # TODO: labels??
 
 def custom_tokenize_function(examples, tokenizer, query, response, multi_field_query):
     if multi_field_query:
