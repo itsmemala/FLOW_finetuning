@@ -221,7 +221,7 @@ def finetune():
             # logits = compute_mas_wgts(model,train_dataloader,args)
             # predicted_token_ids = torch.argmax(logits, dim=-1)
             # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
-            compute_mas_wgts(model,train_dataloader,batch_size,args,'pt1')
+            compute_mas_wgts(model,train_dataloader,batch_size,args,'pt2')
             # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task data
             # batch_size = 2
             # cur_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True)
