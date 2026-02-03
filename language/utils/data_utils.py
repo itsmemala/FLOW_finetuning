@@ -279,7 +279,7 @@ def load_and_preprocess_it(tokenizer, args, with_response=False, multi_field_que
             raw_train_datasets = raw_train_datasets.select(range(start, end))
 
     if with_response:
-        query = [args.dataset_field[:-1]]
+        query = args.dataset_field[:-1] if multi_field_query else args.dataset_field[0]
         response = args.dataset_field[-1]
 
         train_dataset = raw_train_datasets.map(
