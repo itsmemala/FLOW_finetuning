@@ -242,7 +242,6 @@ def custom_preprocess(
 def custom_tokenize_function(examples, tokenizer, query, response, multi_field_query):
     if multi_field_query: # TODO: how to combine query fields
         sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(examples[col] for col in query))]
-        print(sources[:2])
     else:
         sources = [PROMPT.format_map(dict(instruction=instruction)) for instruction in examples[query]]
     targets = [f"{output}{tokenizer.eos_token}" for output in examples[response]]
