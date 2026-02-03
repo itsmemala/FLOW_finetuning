@@ -289,7 +289,7 @@ def load_and_preprocess_it(tokenizer, args, with_response=False, multi_field_que
             batch_size=3000,
             num_proc=32,
             remove_columns=raw_train_datasets.column_names,
-            load_from_cache_file=True,
+            load_from_cache_file=False,
             desc="Running tokenizer on train dataset",
             fn_kwargs={"tokenizer": tokenizer, "query": query, "response": response, "multi_field_query": multi_field_query},
         )
