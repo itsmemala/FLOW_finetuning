@@ -227,8 +227,28 @@ def train_tokenize_function(examples, tokenizer, query, response):
     data_dict = preprocess(sources, targets, tokenizer)
     return data_dict
 
+def custom_preprocess(
+    sources: Sequence[str],
+    targets: Sequence[str],
+    tokenizer: transformers.PreTrainedTokenizer,
+) -> Dict:
+    """Preprocess the data by tokenizing; only used for calculating mas importance weights so no labels."""
+    examples = [s + t for s, t in zip(sources, targets)]
+    examples_tokenized, sources_tokenized = [_tokenize_fn(strings, tokenizer) for strings in (examples, sources)]
+    input_ids = examples_tokenized["input_ids"]
+    return dict(input_ids=input_ids, labels=None) # TODO: labels??
 
-def load_and_preprocess_it(tokenizer, args):
+def custom_tokenize_function(examples, tokenizer, query, response, multi_field_query):
+    if multi_field_query:
+        sources = [PROMPT.format_map(dict(instruction=' '.join(instruction_fields))) for instruction_fields in examples[query]] # TODO: how to combine query fields
+    else:
+        sources = [PROMPT.format_map(dict(instruction=instruction)) for instruction in examples[query]]
+    targets = [f"{output}{tokenizer.eos_token}" for output in examples[response]]
+    data_dict = custom_preprocess(sources, targets, tokenizer)
+    return data_dict
+
+
+def load_and_preprocess_it(tokenizer, args, with_response=False, multi_field_query=False):
     path = args.data_path
     split_range = None
     if "[" in path and "]" in path:
@@ -258,16 +278,31 @@ def load_and_preprocess_it(tokenizer, args):
         else:
             raw_train_datasets = raw_train_datasets.select(range(start, end))
 
-    train_dataset = raw_train_datasets.map(
-        train_tokenize_function,
-        batched=True,
-        batch_size=3000,
-        num_proc=32,
-        remove_columns=raw_train_datasets.column_names,
-        load_from_cache_file=True,
-        desc="Running tokenizer on train dataset",
-        fn_kwargs={"tokenizer": tokenizer, "query": args.dataset_field[0], "response": args.dataset_field[1]},
-    )
+    if with_response:
+        query = [args.dataset_field[:-1]]
+        response = args.dataset_field[-1]
+
+        train_dataset = raw_train_datasets.map(
+            custom_tokenize_function,
+            batched=True,
+            batch_size=3000,
+            num_proc=32,
+            remove_columns=raw_train_datasets.column_names,
+            load_from_cache_file=True,
+            desc="Running tokenizer on train dataset",
+            fn_kwargs={"tokenizer": tokenizer, "query": query, "response": response, "multi_field_query": multi_field_query},
+        )
+    else:
+        train_dataset = raw_train_datasets.map(
+            train_tokenize_function,
+            batched=True,
+            batch_size=3000,
+            num_proc=32,
+            remove_columns=raw_train_datasets.column_names,
+            load_from_cache_file=True,
+            desc="Running tokenizer on train dataset",
+            fn_kwargs={"tokenizer": tokenizer, "query": args.dataset_field[0], "response": args.dataset_field[1]},
+        )
 
     return train_dataset
 
