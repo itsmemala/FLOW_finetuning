@@ -87,7 +87,7 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
         for n,p in model.named_parameters():
             if p.grad is not None:
                 mas[n]+=sbatch*torch.abs(p.grad.data)
-        if bid==(5000//sbatch):
+        if bid==(20000//sbatch):
             break # TODO: Remove
     
     # Mean importance across all samples
