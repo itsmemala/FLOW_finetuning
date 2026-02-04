@@ -244,8 +244,6 @@ def custom_tokenize_function(examples, tokenizer, query, response, multi_field_q
         # sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(examples[col] for col in query))]
         num_examples = len(examples[query[0]])
         sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(zip(*([col]*num_examples,examples[col])) for col in query))]
-        print(sources[0])
-        sys.exit()
     else:
         sources = [PROMPT.format_map(dict(instruction=instruction)) for instruction in examples[query]]
     targets = [f"{output}{tokenizer.eos_token}" for output in examples[response]]
