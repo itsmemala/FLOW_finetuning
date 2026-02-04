@@ -242,7 +242,9 @@ def custom_preprocess(
 def custom_tokenize_function(examples, tokenizer, query, response, multi_field_query):
     if multi_field_query: # TODO: how to combine query fields
         # sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(examples[col] for col in query))]
-        sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(col+examples[col] for col in query))]
+        num_examples = len(examples)
+        print(num_examples)
+        sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*([col]*num_examples+examples[col] for col in query))]
         print(sources[0])
         sys.exit()
     else:
