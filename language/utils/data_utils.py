@@ -244,7 +244,7 @@ def custom_tokenize_function(examples, tokenizer, query, response, multi_field_q
         # sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*(examples[col] for col in query))]
         num_examples = len(examples)
         print(num_examples)
-        sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*([col]*num_examples+examples[col] for col in query))]
+        sources = [PROMPT.format_map(dict(instruction=' '.join(map(str, row_values)))) for row_values in zip(*([str(col)+' ']*num_examples+examples[col] for col in query))]
         print(sources[0])
         sys.exit()
     else:
