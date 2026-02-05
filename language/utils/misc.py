@@ -120,7 +120,7 @@ def overall_pt_mas_wgts(model, args):
         with open(args.base_dir+'/pt'+str(calc_imp_wrt)+'_mas_wgts.pkl', 'rb') as handle:
             taskwise_mas = CPU_Unpickler(handle).load()
         for n,p in model.named_parameters():
-            mas[n] += taskwise_mas
+            mas[n] += taskwise_mas[n]
     for n,p in model.named_parameters():
         mas[n] /= num_tasks
     
