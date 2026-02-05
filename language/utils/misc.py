@@ -116,7 +116,7 @@ def overall_pt_mas_wgts(model, args):
         mas[n]=0*p.data
     
     num_tasks = 8
-    for calc_imp_wrt in range(1,num_tasks+1,1):
+    for calc_imp_wrt in tqdm(range(1,num_tasks+1,1)):
         with open(args.base_dir+'/pt'+str(calc_imp_wrt)+'_mas_wgts.pkl', 'rb') as handle:
             taskwise_mas = CPU_Unpickler(handle).load()
         for n,p in model.named_parameters():
