@@ -101,3 +101,30 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
 
     # return logits
     return
+
+class CPU_Unpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        if module == 'torch.storage' and name == '_load_from_bytes':
+            return lambda b: torch.load(io.BytesIO(b), map_location='cpu')
+        else:
+            return super().find_class(module, name)
+
+def overall_pt_mas_wgts(model, args):
+    mas={}
+    for n,p in model.named_parameters():
+        mas[n]=0*p.data
+    
+    num_tasks = 8
+    for calc_imp_wrt in range(1,num_tasks+1,1):
+        with open(args.base_dir+'/pt'+calc_imp_wrt+'_mas_wgts.pkl', 'rb') as handle:
+            taskwise_mas = CPU_Unpickler(handle).load()
+        for n,p in model.named_parameters():
+            mas[n] += taskwise_mas
+    for n,p in model.named_parameters():
+        mas[n] /= num_tasks
+    
+    # Save
+    with open(args.base_dir+'/pt_mas_wgts.pkl', 'wb') as fp:
+        pickle.dump(mas, fp)
+    
+    return

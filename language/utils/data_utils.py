@@ -272,7 +272,10 @@ def load_and_preprocess_it(tokenizer, args, with_response=False, multi_field_que
             end = int(end) if end else None
             split_range = (start, end)
 
-    raw_train_datasets = load_dataset(path, split=args.dataset_split)
+    if 'mmlu' in path:
+        raw_train_datasets = load_dataset(path, 'all', split=args.dataset_split)
+    else:
+        raw_train_datasets = load_dataset(path, split=args.dataset_split)
 
     if split_range is not None:
         start, end = split_range
