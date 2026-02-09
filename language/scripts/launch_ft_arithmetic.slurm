@@ -68,7 +68,7 @@ SEED=42 # Seed to use
 # NOTE: Accelerate hasn't been tested in a bit, aviod for now
 
 # ===== Experiment Configuration ===== #
-BASE_DIR="/home/local/data/ms/cft_llm/meta-math-flow/Llama-3.2-1B" # Base directory for experiments
+BASE_DIR="/home/local/data/ms/cft_llm/meta-math-flow/Gemma-3-270M" # Base directory for experiments
 WANDB_PROJECT="project-name" # Wandb project to use
 WAND_RUN="none" # Wandb run name to use
 
