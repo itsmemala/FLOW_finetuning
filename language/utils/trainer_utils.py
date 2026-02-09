@@ -4,7 +4,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 from transformers import Trainer
 
-from misc import CPU_Unpickler
+from .misc import CPU_Unpickler
 
 class LARegTrainer(Trainer):
     def __init__(self, weight_regularization="none", base_model=None, reg_lambda=0.01, ignore_index = -100, *args, **kwargs):
