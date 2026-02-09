@@ -18,7 +18,7 @@ from utils.data_utils import (
     DataCollatorForSupervisedDataset,
 )
 from models import create_model_tokenizer_it, create_peft_model_it, IGNORE_INDEX
-from utils.misc import count_parameters, compute_mas_wgts, overall_pt_mas_wgts, compute_rel_imp
+from utils.misc import count_parameters, compute_mas_wgts, overall_pt_mas_wgts, compute_rel_imp, CPU_Unpickler
 from utils.trainer_utils import WeightedLossTrainer, SFATrainer, LARegTrainer
 from utils.parsing_utils import str_to_bool
 
@@ -195,6 +195,12 @@ def finetune():
             print('Computing relative importance')
             compute_rel_imp(args)
         # Train
+        if args.mas_only=="true":
+            with open(args.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
+                param_imp = CPU_Unpickler(handle).load()
+        else:
+            with open(args.base_dir+'/alpha_dash.pkl', 'rb') as handle:
+                param_imp = CPU_Unpickler(handle).load()
         model_copy = model.__class__(model.config)
         model_copy.load_state_dict(model.state_dict())
         model_copy = model_copy.to(args.device)
@@ -205,9 +211,8 @@ def finetune():
             base_model=model_copy,
             weight_regularization=args.weight_regularization,
             reg_lambda=args.weight_regularization_lambda,
-            mas_only=args.mas_only,
             lamb=args.lamb,
-            base_dir=args.base_dir,
+            param_imp=param_imp,
             **data_module,
         )
     elif args.reweight_type == "none" and args.weight_regularization == "none":
