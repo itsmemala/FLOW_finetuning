@@ -190,7 +190,7 @@ def finetune():
             train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)
             print('Calculating importance wrt current data')
             compute_mas_wgts(model,train_dataloader,batch_size,args,'sft')
-        if !args.mas_only: 
+        if args.mas_only==False: 
             # Compute relative importance
             print('Computing relative importance')
             compute_rel_imp(args)
