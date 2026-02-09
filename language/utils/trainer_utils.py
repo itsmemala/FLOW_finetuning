@@ -60,7 +60,7 @@ class LARegTrainer(Trainer):
             loss *= self.accelerator.num_processes
         
         # LA-Reg Loss
-        if args.mas_only:
+        if args.mas_only=="true":
             with open(args.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
                 param_imp = CPU_Unpickler(handle).load()
         else:

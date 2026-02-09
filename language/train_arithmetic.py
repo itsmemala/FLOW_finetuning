@@ -171,7 +171,7 @@ def finetune():
         tokenizer.save_pretrained(os.path.join(run_dir, "tokenizer"))
 
     if args.finetune_type == "lareg":
-        if args.calc_imp_wgts: # calculate importance weights
+        if args.calc_imp_wgts=="true": # calculate importance weights
             # 1. importance of pre-trained model wrt pre-training data
             batch_size = 2
             pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True, multi_field_query=True) # TODO: loop through pt datasets instead
@@ -190,7 +190,7 @@ def finetune():
             train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)
             print('Calculating importance wrt current data')
             compute_mas_wgts(model,train_dataloader,batch_size,args,'sft')
-        if args.mas_only==False: 
+        if args.mas_only=="false": 
             # Compute relative importance
             print('Computing relative importance')
             compute_rel_imp(args)
@@ -322,11 +322,11 @@ if __name__ == "__main__":
     parser.add_argument("--sfa-beta", type=float, default=0.5, help="The beta used to take a convex combination")
 
     #LAREG specific arguments
-    parser.add_argument("--calc_imp_wgts", type=bool, default=False, help="Whether to calculate importance weights (only when using LA-REG)")
+    parser.add_argument("--calc_imp_wgts", type=str, default="false", help="Whether to calculate importance weights (only when using LA-REG)")
     parser.add_argument("--tau_multiplier", type=float, default=0.8, help="Multiplier for setting tau (only when using LA-REG)")
     parser.add_argument("--lamb_max", type=float, default=None, help="Maximum value for regularisation lambda (only when using LA-REG)")
     parser.add_argument("--lamb", type=float, default=None, help="Value for regularisation lambda (only when using LA-REG)")
-    parser.add_argument("--mas_only", type=bool, default=False, help="Whether to apply traditional MAS weighting instead of LA-REG weighting")
+    parser.add_argument("--mas_only", type=str, default="false", help="Whether to apply traditional MAS weighting instead of LA-REG weighting")
     parser.add_argument("--lamb_up", type=float, default=None, help="Value for regularisation lambda_up (only when using LA-REG)")
     parser.add_argument("--lamb_down", type=float, default=None, help="Value for regularisation lambda_down (only when using LA-REG)")
 
