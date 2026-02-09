@@ -54,7 +54,7 @@ class LARegTrainer(Trainer):
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
             name = name.replace('module.','') # TODO: why does this get added in the name??
             if param.requires_grad:
-                loss_reg += torch.sum(param_imp[name].to(logits.device)*(param_old-param).pow(2))
+                loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))
         
         loss += (self.lamb/2)*loss_reg
 
