@@ -36,10 +36,8 @@ class LARegTrainer(Trainer):
 
         if num_items_in_batch is None:
             num_items_in_batch = (~padding_mask).sum()
-        
-        # If we are in a distributed setting, we need to normalize the loss by the number of processes
-        if self.args.average_tokens_across_devices and self.model_accepts_loss_kwargs:
-            loss *= self.accelerator.num_processes
+
+        loss = nll_loss.sum() / num_items_in_batch
         
         # LA-Reg Loss
         if args.mas_only=="true":
@@ -51,7 +49,8 @@ class LARegTrainer(Trainer):
         loss_reg = torch.tensor(0.0, device=logits.device)
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
             loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))
-        loss_reg = (args.lamb/2)*loss_reg
+        
+        loss += (args.lamb/2)*loss_reg
 
         if self.weight_regularization == "l1":
             l1_loss = torch.tensor(0.0, device=logits.device)
