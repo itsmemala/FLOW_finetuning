@@ -11,7 +11,6 @@ class LARegTrainer(Trainer):
         self.weight_regularization = weight_regularization
         self.base_model = base_model
         self.reg_lambda = reg_lambda
-        self.mas_only = mas_only
         self.lamb = lamb
         self.param_imp = param_imp
 
