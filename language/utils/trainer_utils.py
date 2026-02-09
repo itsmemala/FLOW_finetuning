@@ -5,7 +5,7 @@ import torch.distributed as dist
 from transformers import Trainer
 
 class LARegTrainer(Trainer):
-    def __init__(self, weight_regularization="none", base_model=None, reg_lambda=0.01, ignore_index = -100, lamb=1000.0, param_imp=param_imp, *args, **kwargs):
+    def __init__(self, weight_regularization="none", base_model=None, reg_lambda=0.01, ignore_index = -100, lamb=1000.0, param_imp=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ignore_index = ignore_index
         self.weight_regularization = weight_regularization
@@ -46,7 +46,7 @@ class LARegTrainer(Trainer):
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
             name = name.replace('module.','') # TODO: why does this get added in the name??
             if param.requires_grad:
-                loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))        
+                loss_reg += torch.sum(self.param_imp[name]*(param_old-param).pow(2))        
         loss += (self.lamb/2)*loss_reg
 
         if self.weight_regularization == "l1":
