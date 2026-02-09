@@ -36,8 +36,8 @@ LAMB=1000 # Change me
 MAS_ONLY=true # Change me
 LAMB_MAX=1000.0 # Change me
 TAU_MULTIPLIER=0.8 # Change me
-LAMB_UP=None # Change me
-LAMB_DOWN=None # Change me
+LAMB_UP=1.0 # Change me
+LAMB_DOWN=1.0 # Change me
 
 # ===== Data Configuration ===== #
 DATASET="meta-math/MetaMathQA" # Dataset to use (expects huggingface format or path)
