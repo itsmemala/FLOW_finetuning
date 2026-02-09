@@ -205,6 +205,9 @@ def finetune():
             base_model=model_copy,
             weight_regularization=args.weight_regularization,
             reg_lambda=args.weight_regularization_lambda,
+            mas_only=args.mas_only,
+            lamb=args.lamb,
+            base_dir=args.base_dir,
             **data_module,
         )
     elif args.reweight_type == "none" and args.weight_regularization == "none":

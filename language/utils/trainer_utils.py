@@ -7,12 +7,16 @@ from transformers import Trainer
 from .misc import CPU_Unpickler
 
 class LARegTrainer(Trainer):
-    def __init__(self, weight_regularization="none", base_model=None, reg_lambda=0.01, ignore_index = -100, *args, **kwargs):
+    def __init__(self, weight_regularization="none", base_model=None, reg_lambda=0.01, ignore_index = -100, mas_only="false", lamb=1000.0, base_dir="", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ignore_index = ignore_index
         self.weight_regularization = weight_regularization
         self.base_model = base_model
-        self.reg_lambda = reg_lambda   
+        self.reg_lambda = reg_lambda
+        self.mas_only = 
+        self.lamb = 
+        self.base_dir = 
+
 
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         labels = inputs.pop("labels")
@@ -40,17 +44,17 @@ class LARegTrainer(Trainer):
         loss = nll_loss.sum() / num_items_in_batch
         
         # LA-Reg Loss
-        if self.args.mas_only=="true":
-            with open(self.args.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
+        if self.mas_only=="true":
+            with open(self.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
                 param_imp = CPU_Unpickler(handle).load()
         else:
-            with open(self.args.base_dir+'/alpha_dash.pkl', 'rb') as handle:
+            with open(self.base_dir+'/alpha_dash.pkl', 'rb') as handle:
                 param_imp = CPU_Unpickler(handle).load()
         loss_reg = torch.tensor(0.0, device=logits.device)
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
             loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))
         
-        loss += (self.args.lamb/2)*loss_reg
+        loss += (self.lamb/2)*loss_reg
 
         if self.weight_regularization == "l1":
             l1_loss = torch.tensor(0.0, device=logits.device)
