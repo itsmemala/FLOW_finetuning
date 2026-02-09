@@ -36,24 +36,6 @@ class LARegTrainer(Trainer):
 
         if num_items_in_batch is None:
             num_items_in_batch = (~padding_mask).sum()
-
-        if self.loss_type == "sequence":
-            sequence_weights = inputs.pop("sequence_weights")
-
-            weighted_nll_loss = nll_loss.sum(dim=(-2,-1)) * sequence_weights
-            loss = weighted_nll_loss.sum() / num_items_in_batch
-
-        elif self.loss_type == "token":
-            token_weights = inputs.pop("token_weights")
-
-            token_weights[padding_mask.bool().squeeze(-1)] = 0.0 # This is need to avoid over normalizing the loss
-
-            weighted_nll_loss = nll_loss * token_weights[:, :, None]
-            loss = weighted_nll_loss.sum() / num_items_in_batch
-        elif self.loss_type == "none":
-            loss = nll_loss.sum() / num_items_in_batch
-        else:
-            raise RuntimeError(f"Unknown loss type {self.loss_type}, please use [sequence/token]")
         
         # If we are in a distributed setting, we need to normalize the loss by the number of processes
         if self.args.average_tokens_across_devices and self.model_accepts_loss_kwargs:
