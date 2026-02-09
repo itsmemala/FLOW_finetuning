@@ -19,7 +19,7 @@
 export CUDA_VISIBLE_DEVICES='0,1' # Specify which GPU to use
 
 # ===== Model Configuration ===== #
-BASE_MODEL="meta-llama/Llama-3.2-1B"
+BASE_MODEL="google/gemma-3-270m"
 FINETUNE_TYPE="lareg" # none, full, lora, linear-probe, sfa (none will freeze the entire model, which is useful for creating a baseline model)
 
 # ~~ LORA Configuration ~~ #
@@ -31,7 +31,13 @@ SFA_UPDATE_FREQ=0.25
 SFA_BETA=0.5
 
 # ~~ LA-REG Configuration ~~ #
-CALC_IMP_WGTS=true
+CALC_IMP_WGTS=false
+LAMB=1000 # Change me
+MAS_ONLY=true # Change me
+LAMB_MAX=None # Change me
+TAU_MULTIPLIER=0.8 # Change me
+LAMB_UP=None # Change me
+LAMB_DOWN=None # Change me
 
 # ===== Data Configuration ===== #
 DATASET="meta-math/MetaMathQA" # Dataset to use (expects huggingface format or path)
@@ -126,6 +132,12 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
             --calc_imp_wgts $CALC_IMP_WGTS \
+            --tau_multiplier $TAU_MULTIPLIER \
+            --lamb_max $LAMB_MAX \
+            --lamb $LAMB \
+            --mas_only $MAS_ONLY \
+            --lamb_up $LAMB_UP \
+            --lamb_down $LAMB_DOWN \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -158,6 +170,12 @@ if [ "$DEBUG" = false ] && [ "$NUM_GPUS" -gt 1 ]; then
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
             --calc_imp_wgts $CALC_IMP_WGTS \
+            --tau_multiplier $TAU_MULTIPLIER \
+            --lamb_max $LAMB_MAX \
+            --lamb $LAMB \
+            --mas_only $MAS_ONLY \
+            --lamb_up $LAMB_UP \
+            --lamb_down $LAMB_DOWN \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -192,6 +210,12 @@ else
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
             --calc_imp_wgts $CALC_IMP_WGTS \
+            --tau_multiplier $TAU_MULTIPLIER \
+            --lamb_max $LAMB_MAX \
+            --lamb $LAMB \
+            --mas_only $MAS_ONLY \
+            --lamb_up $LAMB_UP \
+            --lamb_down $LAMB_DOWN \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \
@@ -224,6 +248,12 @@ else
             --sfa-update-freq $SFA_UPDATE_FREQ \
             --sfa-beta $SFA_BETA \
             --calc_imp_wgts $CALC_IMP_WGTS \
+            --tau_multiplier $TAU_MULTIPLIER \
+            --lamb_max $LAMB_MAX \
+            --lamb $LAMB \
+            --mas_only $MAS_ONLY \
+            --lamb_up $LAMB_UP \
+            --lamb_down $LAMB_DOWN \
             --batch_size $BATCH_SIZE \
             --epochs $EPOCHS \
             --scheduler $SCHEDULER \

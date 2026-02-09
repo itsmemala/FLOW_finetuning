@@ -18,8 +18,8 @@ from utils.data_utils import (
     DataCollatorForSupervisedDataset,
 )
 from models import create_model_tokenizer_it, create_peft_model_it, IGNORE_INDEX
-from utils.misc import count_parameters, compute_mas_wgts, overall_pt_mas_wgts
-from utils.trainer_utils import WeightedLossTrainer, SFATrainer
+from utils.misc import count_parameters, compute_mas_wgts, overall_pt_mas_wgts, compute_rel_imp
+from utils.trainer_utils import WeightedLossTrainer, SFATrainer, LARegTrainer
 from utils.parsing_utils import str_to_bool
 
 
@@ -170,7 +170,44 @@ def finetune():
             json.dump(training_args.to_dict(), f, indent=4)
         tokenizer.save_pretrained(os.path.join(run_dir, "tokenizer"))
 
-    if args.reweight_type == "none" and args.weight_regularization == "none":
+    if args.finetune_type == "lareg":
+        if args.calc_imp_wgts: # calculate importance weights
+            # 1. importance of pre-trained model wrt pre-training data
+            batch_size = 2
+            pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True, multi_field_query=True) # TODO: loop through pt datasets instead
+            data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
+            train_dataloader = DataLoader(pt_dataset, batch_size=batch_size, collate_fn=data_collator)
+            print('Calculating importance wrt PT data')
+            # logits = compute_mas_wgts(model,train_dataloader,args)
+            # predicted_token_ids = torch.argmax(logits, dim=-1)
+            # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
+            compute_mas_wgts(model,train_dataloader,batch_size,args,'pt2')
+            overall_pt_mas_wgts(model, args) # TODO: loop through pt datasets instead
+            # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task data
+            batch_size = 2
+            cur_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True)
+            data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
+            train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)
+            print('Calculating importance wrt current data')
+            compute_mas_wgts(model,train_dataloader,batch_size,args,'sft')
+        if !args.mas_only: 
+            # Compute relative importance
+            print('Computing relative importance')
+            compute_rel_imp(args)
+        # Train
+        model_copy = model.__class__(model.config)
+        model_copy.load_state_dict(model.state_dict())
+        model_copy = model_copy.to(args.device)
+        trainer = LARegTrainer(
+            model=model,
+            args=training_args,
+            ignore_index=IGNORE_INDEX,
+            base_model=model_copy,
+            weight_regularization=args.weight_regularization,
+            reg_lambda=args.weight_regularization_lambda,
+            **data_module,
+        )
+    elif args.reweight_type == "none" and args.weight_regularization == "none":
         if args.finetune_type == "sfa":
             model_copy = model.__class__(model.config)
             model_copy.load_state_dict(model.state_dict())
@@ -209,32 +246,6 @@ def finetune():
             trainer = WeightedLossTrainer(
                 model=model, args=training_args, loss_type=args.reweight_type, ignore_index=IGNORE_INDEX, **data_module
             )
-
-    if args.finetune_type == "lareg":
-        if args.calc_imp_wgts: # calculate importance weights
-            # 1. importance of pre-trained model wrt pre-training data
-            # batch_size = 2
-            # pt_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True, multi_field_query=True) # TODO: loop through pt datasets instead
-            # data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-            # train_dataloader = DataLoader(pt_dataset, batch_size=batch_size, collate_fn=data_collator)
-            # print('Calculating importance wrt PT data')
-            # # logits = compute_mas_wgts(model,train_dataloader,args)
-            # # predicted_token_ids = torch.argmax(logits, dim=-1)
-            # # print(tokenizer.batch_decode(predicted_token_ids, skip_special_tokens=True))
-            # compute_mas_wgts(model,train_dataloader,batch_size,args,'pt2')
-            overall_pt_mas_wgts(model, args)
-            # 2. importance of SFT model (i.e. model fine-tuned on the current data) wrt current task data
-            # batch_size = 2
-            # cur_dataset = load_and_preprocess_it(tokenizer=tokenizer, args=args, with_response=True)
-            # data_collator = DataCollatorForSupervisedDataset(tokenizer=tokenizer)
-            # train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)
-            # print('Calculating importance wrt current data')
-            # compute_mas_wgts(model,train_dataloader,batch_size,args,'sft')
-            # 3. relative importance
-
-            # save relative importance
-            sys.exit() # TODO: Remove
-        # Load and train
 
 
     model.config.use_cache = False
@@ -312,6 +323,12 @@ if __name__ == "__main__":
 
     #LAREG specific arguments
     parser.add_argument("--calc_imp_wgts", type=bool, default=False, help="Whether to calculate importance weights (only when using LA-REG)")
+    parser.add_argument("--tau_multiplier", type=float, default=0.8, help="Multiplier for setting tau (only when using LA-REG)")
+    parser.add_argument("--lamb_max", type=float, default=None, help="Maximum value for regularisation lambda (only when using LA-REG)")
+    parser.add_argument("--lamb", type=float, default=None, help="Value for regularisation lambda (only when using LA-REG)")
+    parser.add_argument("--mas_only", type=bool, default=False, help="Whether to apply traditional MAS weighting instead of LA-REG weighting")
+    parser.add_argument("--lamb_up", type=float, default=None, help="Value for regularisation lambda_up (only when using LA-REG)")
+    parser.add_argument("--lamb_down", type=float, default=None, help="Value for regularisation lambda_down (only when using LA-REG)")
 
     # General training arguments
     parser.add_argument("--batch_size", type=int, default=4, help="Batch size")

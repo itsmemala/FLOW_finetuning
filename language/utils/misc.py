@@ -129,3 +129,32 @@ def overall_pt_mas_wgts(model, args):
         pickle.dump(mas, fp)
     
     return
+
+def compute_rel_imp(args):
+    with open(args.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
+        pt_mas = CPU_Unpickler(handle).load()
+    with open(args.base_dir+'/sft_mas_wgts.pkl', 'rb') as handle:
+        sft_mas = CPU_Unpickler(handle).load()
+    
+    epsilon = 0.0000000001
+    rel_imp_counter,rel_imp_weighted_mas = {},{}
+    for n in sft_mas.keys():
+        rel_imp = pt_mas[n]/(pt_mas[n]+sft_mas[n]+epsilon)
+        rel_imp_counter[n] = rel_imp
+        # Get distribution to set threshold
+        tau = args.tau_multiplier*torch.nan_to_num(torch.mean(rel_imp.flatten())).item()
+        # Check lamb_up bounding
+        lamb_up_lower_bound = np.ceil(1/max(tau,0.05))
+        lamb_up_upper_bound = max(args.lamb_max/args.lamb,lamb_up_lower_bound)
+        assert args.lamb_up >= lamb_up_lower_bound and args.lamb_up <= lamb_up_upper_bound
+        # Compute the new importance weighting
+        rel_imp_weighted_mas[n][rel_imp>tau] = args.lamb_up*rel_imp[rel_imp>tau]*pt_mas[n][rel_imp>tau]
+        rel_imp_weighted_mas[n][rel_imp<=tau] = args.lamb_down*rel_imp[rel_imp<=tau]*pt_mas[n][rel_imp<=tau]
+    
+    # Save
+    with open(args.base_dir+'/alpha_rel.pkl', 'wb') as fp:
+        pickle.dump(rel_imp_counter, fp)
+    with open(args.base_dir+'/alpha_dash.pkl', 'wb') as fp:
+        pickle.dump(rel_imp_weighted_mas, fp)
+    
+    return
