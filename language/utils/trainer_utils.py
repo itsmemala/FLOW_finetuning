@@ -52,6 +52,7 @@ class LARegTrainer(Trainer):
                 param_imp = CPU_Unpickler(handle).load()
         loss_reg = torch.tensor(0.0, device=logits.device)
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
+            name = name.replace('module.','')
             if param.requires_grad:
                 loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))
         
