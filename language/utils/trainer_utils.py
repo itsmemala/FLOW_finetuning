@@ -13,9 +13,9 @@ class LARegTrainer(Trainer):
         self.weight_regularization = weight_regularization
         self.base_model = base_model
         self.reg_lambda = reg_lambda
-        self.mas_only = 
-        self.lamb = 
-        self.base_dir = 
+        self.mas_only = mas_only
+        self.lamb = lamb
+        self.base_dir = base_dir
 
 
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
