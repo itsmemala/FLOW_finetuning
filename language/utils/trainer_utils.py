@@ -46,13 +46,13 @@ class LARegTrainer(Trainer):
         # LA-Reg Loss
         if self.mas_only=="true":
             with open(self.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
-                param_imp = CPU_Unpickler(handle).load()
+                param_imp = CPU_Unpickler(handle).load().to(logits.device)
         else:
             with open(self.base_dir+'/alpha_dash.pkl', 'rb') as handle:
-                param_imp = CPU_Unpickler(handle).load()
+                param_imp = CPU_Unpickler(handle).load().to(logits.device)
         loss_reg = torch.tensor(0.0, device=logits.device)
         for (name,param),(_,param_old) in zip(model.named_parameters(),self.base_model.named_parameters()):
-            name = name.replace('module.','')
+            name = name.replace('module.','') # TODO: why does this get added in the name??
             if param.requires_grad:
                 loss_reg += torch.sum(param_imp[name]*(param_old-param).pow(2))
         
