@@ -190,15 +190,14 @@ def finetune():
             train_dataloader = DataLoader(cur_dataset, batch_size=batch_size, collate_fn=data_collator)
             print('Calculating importance wrt current data')
             compute_mas_wgts(model,train_dataloader,batch_size,args,'sft')
-        if args.mas_only=="false": 
-            # Compute relative importance
-            print('Computing relative importance')
-            compute_rel_imp(args)
         # Train
         if args.mas_only=="true":
             with open(args.base_dir+'/pt_mas_wgts.pkl', 'rb') as handle:
                 param_imp = CPU_Unpickler(handle).load()
         else:
+            # Compute relative importance
+            print('Computing relative importance')
+            compute_rel_imp(args)
             with open(args.base_dir+'/alpha_dash.pkl', 'rb') as handle:
                 param_imp = CPU_Unpickler(handle).load()
         model_copy = model.__class__(model.config)
