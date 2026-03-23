@@ -80,7 +80,7 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
         # print(logits.shape)
         tokenwise_l2_norm = logits.pow(2).sum(dim=-1)
         # print(tokenwise_l2_norm.shape)
-        seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1) # TODO: Other options? sum?
+        seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1) # TODO: Other options? sum/last token only?
         # print(seqwise_l2_norm.shape)
         batchwise_l2_norm = seqwise_l2_norm.sum()
         batchwise_l2_norm.backward()

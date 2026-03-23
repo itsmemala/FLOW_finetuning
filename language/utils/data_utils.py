@@ -273,9 +273,9 @@ def load_and_preprocess_it(tokenizer, args, with_response=False, multi_field_que
             split_range = (start, end)
 
     if 'mmlu' in path:
-        raw_train_datasets = load_dataset(path, 'all', split=args.dataset_split)
+        raw_train_datasets = load_dataset(path, 'all', split=args.dataset_split, trust_remote_code=True)
     else:
-        raw_train_datasets = load_dataset(path, split=args.dataset_split)
+        raw_train_datasets = load_dataset(path, split=args.dataset_split, trust_remote_code=True)
 
     if split_range is not None:
         start, end = split_range
