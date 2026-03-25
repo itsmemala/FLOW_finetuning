@@ -80,7 +80,7 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
         # print(logits.shape)
         tokenwise_l2_norm = logits.pow(2).sum(dim=-1)
         # print(tokenwise_l2_norm.shape)
-        seqwise_l2_norm = tokenwise_l2_norm.mean(dim=-1) # TODO: Other options? sum/last token only?
+        seqwise_l2_norm = tokenwise_l2_norm[:,0].squeeze() #tokenwise_l2_norm.mean(dim=-1) # TODO: Other options? sum/last token only?
         # print(seqwise_l2_norm.shape)
         batchwise_l2_norm = seqwise_l2_norm.sum()
         batchwise_l2_norm.backward()
@@ -92,8 +92,13 @@ def compute_mas_wgts(model, train, sbatch, args, calc_imp_wrt):
             break # TODO: Remove
     
     # Mean importance across all samples
+    max_mas = torch.zeros(1).to(args.device)
     for n,_ in model.named_parameters():
         mas[n]=mas[n]/len(train)
+        max_mas = torch.max(max_mas,mas[n].max())
+    # Norm
+    for n,_ in model.named_parameters():
+        mas[n]=mas[n]/max_mas
     # Save
     with open(args.base_dir+'/'+calc_imp_wrt+'_mas_wgts.pkl', 'wb') as fp:
         pickle.dump(mas, fp)
